@@ -71,15 +71,16 @@ var defaultNovaMetrics = []Metric{
 	{Name: "memory_used_bytes", Labels: []string{"hostname", "availability_zone", "aggregates"}},
 	{Name: "local_storage_available_bytes", Labels: []string{"hostname", "availability_zone", "aggregates"}},
 	{Name: "local_storage_used_bytes", Labels: []string{"hostname", "availability_zone", "aggregates"}},
+
 	{Name: "free_disk_bytes", Labels: []string{"hostname", "availability_zone", "aggregates"}},
-	{Name: "server_status", Labels: []string{"id", "status", "name", "tenant_id", "user_id", "address_ipv4",
+	{Name: "server_status", Labels: []string{"id", "status", "name", "project_id", "user_id", "address_ipv4",
 		"address_ipv6", "host_id", "hypervisor_hostname", "uuid", "availability_zone", "flavor_id"}},
-	{Name: "limits_vcpus_max", Labels: []string{"tenant", "tenant_id"}, Fn: ListComputeLimits, Slow: true},
-	{Name: "limits_vcpus_used", Labels: []string{"tenant", "tenant_id"}, Slow: true},
-	{Name: "limits_memory_max", Labels: []string{"tenant", "tenant_id"}, Slow: true},
-	{Name: "limits_memory_used", Labels: []string{"tenant", "tenant_id"}, Slow: true},
-	{Name: "limits_instances_used", Labels: []string{"tenant", "tenant_id"}, Slow: true},
-	{Name: "limits_instances_max", Labels: []string{"tenant", "tenant_id"}, Slow: true},
+	{Name: "limits_vcpus_max", Labels: []string{"tenant", "project_id"}, Fn: ListComputeLimits, Slow: true},
+	{Name: "limits_vcpus_used", Labels: []string{"tenant", "project_id"}, Slow: true},
+	{Name: "limits_memory_max", Labels: []string{"tenant", "project_id"}, Slow: true},
+	{Name: "limits_memory_used", Labels: []string{"tenant", "project_id"}, Slow: true},
+	{Name: "limits_instances_used", Labels: []string{"tenant", "project_id"}, Slow: true},
+	{Name: "limits_instances_max", Labels: []string{"tenant", "project_id"}, Slow: true},
 }
 
 func NewNovaExporter(config *ExporterConfig) (*NovaExporter, error) {

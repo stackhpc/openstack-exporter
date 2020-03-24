@@ -57,13 +57,13 @@ var defaultCinderMetrics = []Metric{
 	{Name: "volumes", Fn: ListVolumes},
 	{Name: "snapshots", Fn: ListSnapshots},
 	{Name: "agent_state", Labels: []string{"uuid", "hostname", "service", "adminState", "zone", "disabledReason"}, Fn: ListCinderAgentState},
-	{Name: "volume_status", Labels: []string{"id", "name", "status", "bootable", "tenant_id", "size", "volume_type"}, Fn: nil, Slow: true},
-	{Name: "volume_size", Labels: []string{"resource_id", "name", "status", "bootable", "tenant_id", "volume_type"}, Fn: nil},
+	{Name: "volume_status", Labels: []string{"id", "name", "status", "bootable", "project_id", "size", "volume_type"}, Fn: nil, Slow: true},
+	{Name: "volume_size", Labels: []string{"resource_id", "name", "status", "bootable", "project_id", "user_id", "volume_type"}, Fn: nil},
 	{Name: "volume_status_counter", Labels: []string{"status"}, Fn: nil},
 	{Name: "pool_capacity_free_gb", Labels: []string{"name", "volume_backend_name", "vendor_name"}, Fn: ListCinderPoolCapacityFree},
 	{Name: "pool_capacity_total_gb", Labels: []string{"name", "volume_backend_name", "vendor_name"}, Fn: nil},
-	{Name: "limits_volume_max_gb", Labels: []string{"tenant", "tenant_id"}, Fn: ListVolumeLimits, Slow: true},
-	{Name: "limits_volume_used_gb", Labels: []string{"tenant", "tenant_id"}, Fn: nil, Slow: true},
+	{Name: "limits_volume_max_gb", Labels: []string{"tenant", "project_id"}, Fn: ListVolumeLimits, Slow: true},
+	{Name: "limits_volume_used_gb", Labels: []string{"tenant", "project_id"}, Fn: nil, Slow: true},
 }
 
 func NewCinderExporter(config *ExporterConfig) (*CinderExporter, error) {
@@ -153,7 +153,7 @@ func ListVolumes(exporter *BaseOpenStackExporter, ch chan<- prometheus.Metric) e
 	for _, volume := range allVolumes {
 		ch <- prometheus.MustNewConstMetric(exporter.Metrics["volume_size"].Metric,
 			prometheus.GaugeValue, float64(volume.Size), volume.ID, volume.Name,
-			volume.Status, volume.Bootable, volume.TenantID, volume.VolumeType)
+			volume.Status, volume.Bootable, volume.TenantID, volume.UserID, volume.VolumeType)
 	}
 
 	return nil
