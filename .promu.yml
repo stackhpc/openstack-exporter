@@ -4,7 +4,7 @@ go:
     version: 1.13
 
 repository:
-  path: github.com/priteau/openstack-exporter
+  path: github.com/stackhpc/openstack-exporter
 
 build:
   ldflags: |

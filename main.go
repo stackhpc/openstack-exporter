@@ -8,11 +8,11 @@ import (
 	"os"
 	"strings"
 
-	"github.com/priteau/openstack-exporter/exporters"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/prometheus/common/log"
 	"github.com/prometheus/common/version"
+	"github.com/stackhpc/openstack-exporter/exporters"
 	"gopkg.in/alecthomas/kingpin.v2"
 )
 
