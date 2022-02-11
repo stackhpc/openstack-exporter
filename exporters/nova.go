@@ -62,6 +62,8 @@ type NovaExporter struct {
 
 var defaultNovaMetrics = []Metric{
 	{Name: "flavors", Fn: ListFlavors},
+	{Name: "aggregate_info", Labels: []string{"id", "name", "blazar_owner"}},
+	{Name: "aggregates", Fn: ListAggregates},
 	{Name: "availability_zones", Fn: ListAZs},
 	{Name: "security_groups", Fn: ListComputeSecGroups},
 	{Name: "total_vms", Fn: ListAllServers},
@@ -230,6 +232,38 @@ func ListFlavors(exporter *BaseOpenStackExporter, ch chan<- prometheus.Metric) e
 
 	ch <- prometheus.MustNewConstMetric(exporter.Metrics["flavors"].Metric,
 		prometheus.GaugeValue, float64(len(allFlavors)))
+
+	return nil
+}
+
+func ListAggregates(exporter *BaseOpenStackExporter, ch chan<- prometheus.Metric) error {
+	var allAggregates []aggregates.Aggregate
+
+	allPagesAggregates, err := aggregates.List(exporter.Client).AllPages()
+	if err != nil {
+		return err
+	}
+
+	allAggregates, err = aggregates.ExtractAggregates(allPagesAggregates)
+	if err != nil {
+		return err
+	}
+
+	ch <- prometheus.MustNewConstMetric(exporter.Metrics["aggregates"].Metric,
+		prometheus.GaugeValue, float64(len(allAggregates)))
+
+	for _, agg := range allAggregates {
+
+		keys := make([]string, 0, len(agg.Metadata))
+		values := make([]string, 0, len(agg.Metadata))
+
+		for k, v := range agg.Metadata {
+			keys = append(keys, k)
+			values = append(values, v)
+		}
+		ch <- prometheus.MustNewConstMetric(exporter.Metrics["aggregate_info"].Metric,
+			prometheus.GaugeValue, 1.0, fmt.Sprintf("%v", agg.ID), agg.Name, agg.Metadata["blazar:owner"])
+	}
 
 	return nil
 }
