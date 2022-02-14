@@ -1,6 +1,7 @@
 package exporters
 
 import (
+	"fmt"
 	"strconv"
 
 	"github.com/gophercloud/gophercloud/openstack/identity/v3/domains"
@@ -81,7 +82,8 @@ func ListProjects(exporter *BaseOpenStackExporter, ch chan<- prometheus.Metric) 
 		ch <- prometheus.MustNewConstMetric(exporter.Metrics["project_info"].Metric,
 			prometheus.GaugeValue, 1.0, strconv.FormatBool(p.IsDomain),
 			p.Description, p.DomainID, strconv.FormatBool(p.Enabled), p.ID, p.Name,
-			p.ParentID, p.Extra["allocation"], p.Extra["used"])
+			p.ParentID, fmt.Sprintf("%v", p.Extra["allocation"]),
+			fmt.Sprintf("%v", p.Extra["used"]))
 	}
 
 	return nil
