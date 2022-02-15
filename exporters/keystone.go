@@ -21,7 +21,9 @@ var defaultKeystoneMetrics = []Metric{
 	{Name: "users", Fn: ListUsers},
 	{Name: "groups", Fn: ListGroups},
 	{Name: "projects", Fn: ListProjects},
-	{Name: "project_info", Labels: []string{"is_domain", "description", "domain_id", "enabled", "id", "name", "parent_id", "allocation", "used"}},
+	{Name: "project_info", Labels: []string{"is_domain", "description", "domain_id", "enabled", "id", "name", "parent_id"}},
+	{Name: "project_allocation", Labels: []string{"id", "name"}},
+	{Name: "project_used", Labels: []string{"id", "name"}},
 	{Name: "regions", Fn: ListRegions},
 }
 
@@ -79,11 +81,24 @@ func ListProjects(exporter *BaseOpenStackExporter, ch chan<- prometheus.Metric) 
 	ch <- prometheus.MustNewConstMetric(exporter.Metrics["projects"].Metric,
 		prometheus.GaugeValue, float64(len(allProjects)))
 	for _, p := range allProjects {
+		var allocation float64
+		var used float64
+
 		ch <- prometheus.MustNewConstMetric(exporter.Metrics["project_info"].Metric,
 			prometheus.GaugeValue, 1.0, strconv.FormatBool(p.IsDomain),
-			p.Description, p.DomainID, strconv.FormatBool(p.Enabled), p.ID, p.Name,
-			p.ParentID, fmt.Sprintf("%v", p.Extra["allocation"]),
-			fmt.Sprintf("%v", p.Extra["used"]))
+			p.Description, p.DomainID, strconv.FormatBool(p.Enabled), p.ID, p.Name, p.ParentID)
+
+		if s, err := strconv.ParseFloat(fmt.Sprintf("%v", p.Extra["allocation"]), 32); err == nil {
+			allocation = s
+		}
+		if s, err := strconv.ParseFloat(fmt.Sprintf("%v", p.Extra["used"]), 32); err == nil {
+			used = s
+		}
+		ch <- prometheus.MustNewConstMetric(exporter.Metrics["project_allocation"].Metric,
+			prometheus.GaugeValue, allocation, p.ID, p.Name)
+
+		ch <- prometheus.MustNewConstMetric(exporter.Metrics["project_used"].Metric,
+			prometheus.GaugeValue, used, p.ID, p.Name)
 	}
 
 	return nil
