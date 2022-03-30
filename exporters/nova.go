@@ -114,6 +114,7 @@ func NewNovaExporter(config *ExporterConfig) (*NovaExporter, error) {
 			exporter.Client.Microversion = microversion.Version
 		}
 	}
+	exporter.Client.Microversion = "2.79"
 
 	return &exporter, nil
 }
