@@ -46,7 +46,7 @@ var defaultContainerInfraMetrics = []Metric{
 	{Name: "total_clusters", Fn: ListAllClusters},
 	{Name: "cluster_masters", Labels: []string{"uuid", "name", "stack_id", "status", "node_count", "project_id"}, Fn: nil},
 	{Name: "cluster_nodes", Labels: []string{"uuid", "name", "stack_id", "status", "master_count", "project_id"}, Fn: nil},
-	{Name: "cluster_status", Labels: []string{"uuid", "name", "stack_id", "status", "node_count", "master_count", "project_id"}, Fn: nil},
+	{Name: "cluster_status", Labels: []string{"uuid", "name", "stack_id", "status", "health_status", "node_count", "master_count", "project_id"}, Fn: nil},
 }
 
 func NewContainerInfraExporter(config *ExporterConfig, logger log.Logger) (*ContainerInfraExporter, error) {
@@ -90,7 +90,7 @@ func ListAllClusters(exporter *BaseOpenStackExporter, ch chan<- prometheus.Metri
 			cluster.StackID, cluster.Status, strconv.Itoa(cluster.MasterCount), cluster.ProjectID)
 		ch <- prometheus.MustNewConstMetric(exporter.Metrics["cluster_status"].Metric,
 			prometheus.GaugeValue, float64(mapClusterStatus(cluster.Status)), cluster.UUID, cluster.Name,
-			cluster.StackID, cluster.Status, strconv.Itoa(cluster.NodeCount), strconv.Itoa(cluster.MasterCount), cluster.ProjectID)
+			cluster.StackID, cluster.Status, cluster.HealthStatus, strconv.Itoa(cluster.NodeCount), strconv.Itoa(cluster.MasterCount), cluster.ProjectID)
 	}
 	return nil
 }
